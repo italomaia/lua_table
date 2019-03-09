@@ -50,12 +50,31 @@ local function distinct (t)
   return tmp
 end
 
+--- returns a new table with all keys in `t`
+--
+-- @table
+-- @return new table
+-- @usage values({3,4,5})  -- {1, 2, 3}
+-- @usage values({a=1, b=2, c=3})  -- {'a', 'b', 'c'}
+-- @see `values`
+local function keys (t)
+  local tmp = {}
+
+  for k, v in pairs(t) do
+    table.insert(tmp, k)
+  end
+
+  return tmp
+end
+
 --- compares the values of `t1` and `t2` for each key of both
--- returns false if any of the values differ
+-- returns false if any of the values differ and works with nested
+-- tables
 --
 -- @table
 -- @table
 -- @return whether all values are equal
+-- @depends distinct, append, keys
 -- @usage equal({1, 2}, {1, 2})  -- true
 -- @usage equal({1, 2}, {2, 1})  -- false
 -- @usage equal({a=1, b=2}, {b=2, a=1})  -- true
@@ -63,8 +82,19 @@ local function equal (t1, t2)
   -- shortcircuit
   if #t1 ~= #t2 then return false end
 
-  for _, key in distinct(append(keys(t1), keys(t2))) do
-    if t1[key] ~= t2[key] then
+  for _, key in pairs(distinct(append(keys(t1), keys(t2)))) do
+    -- check type first
+    if type(t1[key]) ~= type(t2[key]) then
+      return false
+    end
+
+    -- compare tables?
+    if type(t1[key]) == 'table' then
+      if not equal(t1[key], t2[key]) then
+        return false
+      end
+    -- compare scalars!
+    elseif t1[key] ~= t2[key] then
       return false
     end
   end
@@ -140,23 +170,6 @@ local function join (t1, t2)
 
   for k, v in pairs(t2) do
     tmp[k] = v
-  end
-
-  return tmp
-end
-
---- returns a new table with all keys in `t`
---
--- @table
--- @return new table
--- @usage values({3,4,5})  -- {1, 2, 3}
--- @usage values({a=1, b=2, c=3})  -- {'a', 'b', 'c'}
--- @see `values`
-local function keys (t)
-  local tmp = {}
-
-  for k, v in pairs(t) do
-    table.insert(tmp, k)
   end
 
   return tmp
@@ -253,18 +266,18 @@ local function values (t)
 end
 
 return {
-  append,
-  copy,
-  distinct,
-  equal,
-  flat,
-  foreach,
-  immutable,
-  join,
-  keys,
-  merge,
-  set,
-  slice,
-  union,
-  values,
+  ['append']=append,
+  ['copy']=copy,
+  ['distinct']=distinct,
+  ['equal']=equal,
+  ['flat']=flat,
+  ['foreach']=foreach,
+  ['immutable']=immutable,
+  ['join']=join,
+  ['keys']=keys,
+  ['merge']=merge,
+  ['set']=set,
+  ['slice']=slice,
+  ['union']=union,
+  ['values']=values,
 }
