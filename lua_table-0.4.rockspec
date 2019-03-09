@@ -17,5 +17,10 @@ description = {
 }
 dependencies = {
    "lua >= 5.1"
-   -- If you depend on other rocks, add them here
+}
+build = {
+    type = "builtin",
+    modules = {
+        lua_table = "src/lua_table.lua"
+    }
 }
