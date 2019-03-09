@@ -51,7 +51,14 @@ describe('distinct output is as expected', function ()
     assert.are.same(distinct({1, 1, 2, 3}), {1, 2, 3})
   end)
 
-  it("doesn't remove repeated tables", function ()
+  it("removes same instance", function ()
+    local n = {2, 3}
+    local t = {1, n, n}
+
+    assert.are.same(distinct(t), {1, n})
+  end)
+
+  it("keeps same table", function ()
     local t = {1, {2, 3}, {2, 3}}
 
     assert.are.same(distinct(t), t)
