@@ -1,3 +1,35 @@
+--- inserts all values of `t2` to `t1`
+--
+-- @table array
+-- @table array
+-- @return `t1`
+-- @usage a, b = {1}, {2}; union(a, b) -- {1, 2}
+local function append (t1, t2)
+  for k, v in pairs(t2) do
+    table.insert(t1, v)
+  end
+
+  return t1
+end
+
+--- creates a deep copy of `t` ignoring protected attributes
+-- keys are copied as they are; if value is a table, copy is recursively
+-- called for it; make sure table is not a cyclic tree before using copy.
+--
+-- @table non cyclic tree
+-- @return new table with all non-protected attributes of `t`
+local function copy (t)
+  local tmp = {}
+
+  for k, v in pairs(t) do
+      if type(v) == 'table' then
+          tmp[k] = copy(v)
+      else tmp[k] = v end
+  end
+
+  return tmp
+end
+
 --- calls `fn` for each (key, value) of `t`
 --
 -- @table
@@ -62,27 +94,6 @@ local function join (t1, t2)
   return tmp
 end
 
---- creates a deep copy of `t` ignoring protected attributes
--- keys are copied as they are; if value is a table, copy is recursively
--- called for it; make sure table is not a cyclic tree before using copy.
---
--- @table non cyclic tree
--- @return new table with all non-protected attributes of `t`
-local function copy (t)
-    local tmp = {}
-
-    for k, v in pairs(t) do
-        if type(v) == 'table' then
-            tmp[k] = copy(v)
-        else tmp[k] = v end
-    end
-
-    return tmp
-end
-
-local function deep_copy (t)
-end
-
 --- creates a new array without repeated values that ignores repeated values
 --
 -- @table[opt={}]
@@ -121,6 +132,14 @@ end
 -- @table
 -- @return new immutable table
 local function immutable (t)
+  local mt = getmetatable(t) or {}
+
+  mt.__index = copy(t)
+  mt.__newindex = function (t, k, v)
+    error("attempt to change immutable table")
+  end
+
+  return setmetatable({}, mt)
 end
 
 --- creates a new array with all values of `t1` and `t2`
@@ -137,21 +156,15 @@ local function concat (t1, t2)
   return tmp
 end
 
---- appends all values of `t2` to `t1`
+--- flattens up array items of `t` into single values
+-- level controls how many levels of the array should be flattened
+--
 -- @table array
--- @table array
--- @return `t1`
--- @usage a, b = {1}, {2}; union(a, b) -- {1, 2}
-local function append (t1, t2)
-  for k, v in pairs(t2) do
-    table.insert(t1, v)
-  end
-
-  return t1
-end
-
----
--- @table array
+-- @int
+-- @return
+-- @usage flat({1, {2}})  -- {1, 2}
+-- @usage flat({1, {2, {3}}})  -- {1, 2, {3}}
+-- @usage flat({1, {2, {3}}}, 2)  -- {1, 2, 3}
 local function flat (t, level)
   local tmp = {}
   level = level or 1
@@ -195,20 +208,32 @@ local function values (t)
   return tmp
 end
 
+--- compares the values of `t1` and `t2` for each key of both
+-- returns false if any of the values differ
+-- @table
+-- @table
+-- @return whether all values are equal
+-- @usage
 local function equal (t1, t2)
-  for k, v in pairs(t1) do
-
+  for _, key in distinct(append(keys(t1), keys(t2))) do
+    if t1[key] ~= t2[key] then
+      return false
+    end
   end
-  for k, v in pairs(t2) do end
+
+  return true
 end
 
 return {
-  merge,
-  join,
-  slice,
-  foreach,
+  append,
+  concat,
   copy,
-  set,
   distinct,
-  immutable
+  equal,
+  foreach,
+  immutable,
+  join,
+  merge,
+  set,
+  slice,
 }
