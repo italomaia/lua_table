@@ -93,3 +93,34 @@ describe('equal output is as expected', function ()
   end)
 end)
 
+describe('flat output is as expected', function ()
+  local flat = require('lua_table').flat
+end)
+
+describe('foreach output is as expected', function ()
+  local foreach = require('lua_table').foreach
+end)
+describe('immutable output is as expected', function ()
+  local immutable = require('lua_table').immutable
+end)
+describe('join output is as expected', function ()
+  local join = require('lua_table').join
+end)
+describe('keys output is as expected', function ()
+  local keys = require('lua_table').keys
+end)
+describe('merge output is as expected', function ()
+  local merge = require('lua_table').merge
+end)
+describe('set output is as expected', function ()
+  local set = require('lua_table').set
+end)
+describe('slice output is as expected', function ()
+  local slice = require('lua_table').slice
+end)
+describe('union output is as expected', function ()
+  local union = require('lua_table').union
+end)
+describe('values output is as expected', function ()
+  local values = require('lua_table').values
+end)
