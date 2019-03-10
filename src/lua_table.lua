@@ -1,4 +1,6 @@
---- inserts all values of `t2` to `t1`
+--- inserts all values of `t2` in `t1`
+-- keys of `t2` are not preserved; `t2` are inserted
+-- in order only if `t2` is an array.
 --
 -- @table array
 -- @table array
@@ -6,7 +8,7 @@
 -- @usage a, b = {1}, {2}; union(a, b) -- {1, 2}
 -- @see `union` for non-destructive form
 local function append (t1, t2)
-  for k, v in pairs(t2) do
+  for _, v in pairs(t2) do
     table.insert(t1, v)
   end
 
@@ -134,6 +136,22 @@ local function foreach (t, fn)
   end
 end
 
+--- creates a table with protected values
+-- use it to easely customize table value set and unset
+--
+-- @table
+-- @function(t, k, v) __newindex
+-- @table base table; use it for custom functions
+-- @return proxied table
+local function proxy (t, newindex, base)
+  return setmetatable(base or {}, {
+    __index = t,
+    __newindex = function (_, k, v) return newindex(t, k, v) end,
+    __len = function () return #t end,
+    __pairs = function () return next, t, nil end,
+  })
+end
+
 --- creates a immutable table
 --
 -- @table
@@ -141,14 +159,10 @@ end
 -- @usage immutable({a=1, b=2, c=3})  -- constants map
 -- @usage immutable({1, 2, 3})  -- tuple
 local function immutable (t)
-  local mt = getmetatable(t) or {}
-
-  mt.__index = copy(t)
-  mt.__newindex = function (t, k, v)
+  -- copy `t` so changes to `t` do not not affect immutable
+  return proxy(copy(t), function (t, k, v)
     error("attempt to change immutable table")
-  end
-
-  return setmetatable({}, mt)
+  end)
 end
 
 --- copies all public (key, value) of `t1` and `t2` into a new table and returns it
@@ -198,20 +212,21 @@ end
 -- @return
 -- @usage set({1, 1, 2, 2, 3})  -- {1, 2, 3}
 local function set (t)
-  local tmp = t and distinct(t) or {}
-  local value_map = {}
+  local rev = {}  -- reverse index
+  local tmp = distinct(t) or {}
 
-  for k, v in pairs(tmp) do
-    value_map[v] = true
-  end
+  for k, v in pairs(tmp) do rev[v] = true end
 
-  return setmetatable({}, {
-    __index = tmp,
-    __newindex = function (t, k, v)
-      if not value_map[v] then
-        value_map[v] = true
-        t[k] = v
-      end
+  -- force newindex call with "emptish" table
+  return proxy(tmp, function (_, k, v)
+    if v == nil then  -- value is being removed
+      rev[v], tmp[k] = nil, nil
+    elseif rev[v] == nil then  -- new value
+      rev[v], tmp[k] = true, v
+    end  -- value is indexed; ignore
+  end, {
+    has = function (_, v)
+      return rev[v] == true
     end
   })
 end
@@ -224,6 +239,8 @@ end
 -- @return table with only the elements of the slice
 local function slice (t, _i, _e)
   local tmp = {}
+  _i = math.max(_i, 1)
+  _e = _e or #t
 
   for i=_i, _e do
     table.insert(tmp, t[i])
@@ -247,6 +264,8 @@ local function sorted (t, fn)
 end
 
 --- creates a new array with all values of `t1` and `t2`
+-- keys are not preserved; order of the values is not
+-- guaranteed.
 --
 -- @table
 -- @table
@@ -254,9 +273,13 @@ end
 -- @usage union({3, 4}, {1, 2})  -- {3, 4, 1, 2}
 -- @see `append` for destructive form
 local function union (t1, t2)
-  local tmp = copy(t1)
+  local tmp = {}
 
-  for k, v in pairs(t2) do
+  for _, v in pairs(t1) do
+    table.insert(tmp, v)
+  end
+
+  for _, v in pairs(t2) do
     table.insert(tmp, v)
   end
 
@@ -290,6 +313,7 @@ return {
   ['join']=join,
   ['keys']=keys,
   ['merge']=merge,
+  ['proxy']=proxy,
   ['set']=set,
   ['slice']=slice,
   ['sorted']=sorted,

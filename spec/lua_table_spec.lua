@@ -10,11 +10,14 @@ describe('append output is as expected', function ()
   end)
 
   it('appends all items of t2 to t1', function ()
-    local t1, t2 = {1, 2}, {2, 3}
-    local rs = append(t1, t2)
-
-    assert.are.equal(#rs, 4)
-    assert.are.same(rs, {1, 2, 2, 3})
+    assert.are.same(append({1, 2}, {2, 3}), {1, 2, 2, 3})
+    -- keys of `t1` are preserved when joining non-arrays
+    local t = append({a=1, b=2}, {b=3, c=4})
+    assert.are.equal(t.a, 1)
+    assert.are.equal(t.b, 2)
+    -- appending non-arrays has unexpected results
+    assert.are.is_true((t[1] == 3) or (t[1] == 4))
+    assert.are.is_true((t[2] == 3) or (t[2] == 4))
   end)
 end)
 
@@ -153,6 +156,9 @@ describe('foreach output is as expected', function ()
       table.insert(t_v, v)
     end)
 
+    table.sort(t_k)
+    table.sort(t_v)
+
     assert.are.equal(#t_k, 3)
     assert.are.equal(t_k[1], 'a')
     assert.are.equal(t_k[2], 'b')
@@ -228,6 +234,7 @@ end)
 
 describe('keys output is as expected', function ()
   local keys = require('lua_table').keys
+  local sorted = require('lua_table').sorted
 
   it('works with empty tables', function ()
     assert.are.same(keys({}), {})
@@ -237,7 +244,7 @@ describe('keys output is as expected', function ()
     -- order is guaranteed for arrays
     assert.are.same(keys({4, 5, 6}), {1, 2, 3})
     -- order is not guaranteed for tables
-    assert.are.same(table.sort(keys({a=4, b=5, c=6})), {'a', 'b', 'c'})
+    assert.are.same(sorted(keys({a=4, b=5, c=6})), {'a', 'b', 'c'})
   end)
 end)
 
@@ -264,16 +271,51 @@ describe('merge output is as expected', function ()
   end)
 end)
 
+describe('proxy creates expected behavior', function ()
+  local proxy = require('lua_table').proxy
+  local equal = require('lua_table').equal
+
+  it('newindex is always called', function ()
+    local count = 0
+    local t = {3, 4, 5}
+    local p = proxy(t, function (t, k, v)
+      t[k] = v
+      count = count + 1
+    end)
+
+    table.insert(p, 10)
+    assert.is_true(equal(t, p))
+    assert.are.equal(#t, 4)
+    assert.are.equal(#p, 4)
+    assert.are.equal(count, 1)
+  end)
+
+  it('allows to protect value set', function ()
+    local t = {3, 4, 5}
+    local p = proxy(t, function (t, k, v) end)
+
+    table.insert(p, 10)
+    assert.is_true(equal(t, p))
+    assert.are.equal(#t, 3)
+    assert.are.equal(#p, 3)
+  end)
+end)
+
 describe('set output is as expected', function ()
   local set = require('lua_table').set
+  local equal = require('lua_table').equal
+
+  it('behaves as regular tables', function ()
+    assert.are.is_true(equal(set({3, 4, 5}), {3, 4, 5}))
+  end)
 
   it('removes repeated values', function ()
-    local t = {1, 1, 2, 3}
+    local t = {3, 3, 4, 5}
     local s = set(t)
 
     assert.are_not.equal(#t, #s)
     assert.are.equal(#s, 3)
-    assert.are.same(s, {1, 2, 3})
+    assert.are.is_true(equal(s, {3, 4, 5}))
   end)
 
   it("doesn't add repetead values", function ()
@@ -288,16 +330,42 @@ describe('set output is as expected', function ()
     assert.are.equal(#s, 4)
   end)
 
-  it('adds contains method', function ()
+  it('adds has method', function ()
     local s = set({1, 2, 3})
 
-    assert.is_true(s:contains(3))
-    assert.is_false(s:contains(5))
+    assert.is_true(s:has(3))
+    assert.is_false(s:has(5))
   end)
 end)
 
 describe('slice output is as expected', function ()
   local slice = require('lua_table').slice
+
+  it('returns empty if index out-of-bound', function()
+    local t = {1, 2, 3, 4, 5}
+
+    assert.are.same(slice(t, 6, 8), {})
+    assert.are.same(slice(t, -5, 0), {})
+    assert.are.same(slice(t, -1, 2), {1, 2})
+  end)
+
+  it('slices if index in-bound', function ()
+    local t = {1, 2, 3, 4, 5}
+
+    assert.are.same(slice(t, 1, 3), {1, 2, 3})
+  end)
+
+  it('slices up to last item if end bound is not provided', function ()
+    local t = {1, 2, 3, 4, 5}
+
+    assert.are.same(slice(t, 3), {3, 4, 5})
+  end)
+
+  it('slices works for equal indexes', function ()
+    local t = {1, 2, 3, 4, 5}
+
+    assert.are.same(slice(t, 3, 3), {3})
+  end)
 end)
 
 describe('sorted output is as expected', function ()
@@ -316,11 +384,12 @@ end)
 
 describe('union output is as expected', function ()
   local union = require('lua_table').union
+  local sorted = require('lua_table').sorted
 
-  it('re-uses instance', function ()
+  it('creates a new instance instance', function ()
     local t1, t2 = {a=1, b=2}, {b=3, c=4}
 
-    assert.are.equal(union(t1, t2), t1)
+    assert.are_not.equal(union(t1, t2), t1)
     assert.are_not.equal(union(t1, t2), t2)
   end)
 
@@ -331,14 +400,16 @@ describe('union output is as expected', function ()
   end)
 
   it('second table values overrides the first', function ()
-    local t1, t2 = {a=1, b=2}, {b=3, c=4}
-
-    assert.are.same(union(t1, t2), {a=1, b=3, c=4})
+    -- values order is guaranteed for arrays
+    assert.are.same(union({'a', 'b'}, {'b', 'c'}), {'a', 'b', 'b', 'c'})
+    -- keys are not preserved; order is not guaranteed for non-arrays
+    assert.are.same(sorted(union({a=1, b=2}, {b=3, c=4})), {[1]=1, [2]=2, [3]=3, [4]=4})
   end)
 end)
 
 describe('values output is as expected', function ()
   local values = require('lua_table').values
+  local sorted = require('lua_table').sorted
 
   it('works with empty tables', function ()
     assert.are.same(values({}), {})
@@ -348,6 +419,6 @@ describe('values output is as expected', function ()
     -- order is guaranteed for arrays
     assert.are.same(values({4, 5, 6}), {4, 5, 6})
     -- order is not guaranteed for tables
-    assert.are.same(table.sort(values({a=4, b=5, c=6})), {4, 5, 6})
+    assert.are.same(sorted(values({a=4, b=5, c=6})), {4, 5, 6})
   end)
 end)
