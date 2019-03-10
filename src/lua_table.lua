@@ -117,7 +117,7 @@ local function flat (t, level)
 
   for k, v in pairs(t) do
     if type(v) == 'table' and level > 0 then
-      tmp = concat(tmp, flat(v, level-1))
+      append(tmp, flat(v, level-1))
     else tmp[k] = v end
   end
 
@@ -232,6 +232,20 @@ local function slice (t, _i, _e)
   return tmp
 end
 
+--- creates a sorted copy of `t`
+--
+-- @table
+-- @function(a, b)
+-- @return new table
+-- @usage sorted({4, 3})  -- {3, 4}
+local function sorted (t, fn)
+  local tmp = copy(t)
+
+  table.sort(tmp, fn)
+
+  return tmp
+end
+
 --- creates a new array with all values of `t1` and `t2`
 --
 -- @table
@@ -278,6 +292,7 @@ return {
   ['merge']=merge,
   ['set']=set,
   ['slice']=slice,
+  ['sorted']=sorted,
   ['union']=union,
   ['values']=values,
 }
