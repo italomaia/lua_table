@@ -27,6 +27,10 @@
 <h1>lua_table</h1>
 
 
+<h2>Contents</h2>
+<ul>
+<li><a href="#Local_Functions">Local Functions</a></li>
+</ul>
 
 
 <h2>Modules</h2>
@@ -49,18 +53,707 @@
     </ul>
 
 
+<h2><a href="#Local_Functions">Local Functions</a></h2>
+<table class="function_list">
+	<tr>
+	<td class="name" nowrap><a href="#append">append (t1, t2)</a></td>
+	<td class="summary">inserts all values of t2 in t1
+ keys of t2 are not preserved; t2 are inserted
+ in order only if t2 is an array.</td>
+	</tr>
+	<tr>
+	<td class="name" nowrap><a href="#copy">copy (t)</a></td>
+	<td class="summary">creates a deep copy of t; ignores metatable
+ keys are copied as they are; if value is a table, copy is recursively
+ called for it; make sure table is not a cyclic tree before using copy.</td>
+	</tr>
+	<tr>
+	<td class="name" nowrap><a href="#distinct">distinct (t)</a></td>
+	<td class="summary">creates a new array without repeated values</td>
+	</tr>
+	<tr>
+	<td class="name" nowrap><a href="#keys">keys (t)</a></td>
+	<td class="summary">creates a new array with all keys of t</td>
+	</tr>
+	<tr>
+	<td class="name" nowrap><a href="#same">same (t1, t2)</a></td>
+	<td class="summary">compares the values of t1 and t2 for each key of both
+ returns false if any of the values differ and works with nested
+ tables</td>
+	</tr>
+	<tr>
+	<td class="name" nowrap><a href="#flat">flat (t, level)</a></td>
+	<td class="summary">flattens up array items of t into single values
+ level controls how many levels of the array should be flattened</td>
+	</tr>
+	<tr>
+	<td class="name" nowrap><a href="#foreach">foreach (t, fn)</a></td>
+	<td class="summary">calls fn for each (key, value) of t</td>
+	</tr>
+	<tr>
+	<td class="name" nowrap><a href="#proxy">proxy (t, newindex, base)</a></td>
+	<td class="summary">creates a table with protected values
+ use it to easely customize table value set and unset</td>
+	</tr>
+	<tr>
+	<td class="name" nowrap><a href="#immutable">immutable (t)</a></td>
+	<td class="summary">creates a immutable table</td>
+	</tr>
+	<tr>
+	<td class="name" nowrap><a href="#join">join (t1, t2)</a></td>
+	<td class="summary">copies all public (key, value) of t1 and t2 into a new table and returns it
+ if t1 and t2 have key collision, t2 value will have precedence</td>
+	</tr>
+	<tr>
+	<td class="name" nowrap><a href="#merge">merge (t1, t2)</a></td>
+	<td class="summary">copies all (key, value) of t2 into t1 and returns it</td>
+	</tr>
+	<tr>
+	<td class="name" nowrap><a href="#patch">patch (t1, t2)</a></td>
+	<td class="summary">copies all (key, value) of t2 into t1; throws an error on key collision
+ useful if you want to prevent collision</td>
+	</tr>
+	<tr>
+	<td class="name" nowrap><a href="#set">set ([t={}])</a></td>
+	<td class="summary">creates a new array without repeated values that ignores repeated values</td>
+	</tr>
+	<tr>
+	<td class="name" nowrap><a href="#slice">slice (t, _i, _e)</a></td>
+	<td class="summary">gets you an slice of the array
+ negative indexes are not supported</td>
+	</tr>
+	<tr>
+	<td class="name" nowrap><a href="#sorted">sorted (t, fn)</a></td>
+	<td class="summary">creates a sorted copy of t</td>
+	</tr>
+	<tr>
+	<td class="name" nowrap><a href="#union">union (t1, t2)</a></td>
+	<td class="summary">creates a new array with all values of t1 and t2
+ keys are not preserved; order of the values is not
+ guaranteed.</td>
+	</tr>
+	<tr>
+	<td class="name" nowrap><a href="#values">values (t)</a></td>
+	<td class="summary">creates a new array with all values of t</td>
+	</tr>
+</table>
 
 <br/>
 <br/>
 
 
+    <h2 class="section-header "><a name="Local_Functions"></a>Local Functions</h2>
+
+    <dl class="function">
+    <dt>
+    <a name = "append"></a>
+    <strong>append (t1, t2)</strong>
+    </dt>
+    <dd>
+    inserts all values of t2 in t1
+ keys of t2 are not preserved; t2 are inserted
+ in order only if t2 is an array.
+
+
+    <h3>Parameters:</h3>
+    <ul>
+        <li><span class="parameter">t1</span>
+            <span class="types"><span class="type">array</span></span>
+
+        </li>
+        <li><span class="parameter">t2</span>
+            <span class="types"><span class="type">array</span></span>
+
+        </li>
+    </ul>
+
+    <h3>Returns:</h3>
+    <ol>
+
+        t1
+    </ol>
+
+
+    <h3>See also:</h3>
+    <ul>
+         <a href="index.html#union">union</a>
+    </ul>
+
+    <h3>Usage:</h3>
+    <ul>
+        <pre class="example">a, b = {<span class="number">1</span>}, {<span class="number">2</span>}; union(a, b) <span class="comment">-- {1, 2}</span></pre>
+    </ul>
+
+</dd>
+    <dt>
+    <a name = "copy"></a>
+    <strong>copy (t)</strong>
+    </dt>
+    <dd>
+    creates a deep copy of t; ignores metatable
+ keys are copied as they are; if value is a table, copy is recursively
+ called for it; make sure table is not a cyclic tree before using copy.
+
+
+    <h3>Parameters:</h3>
+    <ul>
+        <li><span class="parameter">t</span>
+            <span class="types"><a class="type" href="https://www.lua.org/manual/5.3/manual.html#6.6">table</a></span>
+         non cyclic table
+        </li>
+    </ul>
+
+    <h3>Returns:</h3>
+    <ol>
+
+        new table with all attributes of `t`
+    </ol>
+
+
+
+
+</dd>
+    <dt>
+    <a name = "distinct"></a>
+    <strong>distinct (t)</strong>
+    </dt>
+    <dd>
+    creates a new array without repeated values
+
+
+    <h3>Parameters:</h3>
+    <ul>
+        <li><span class="parameter">t</span>
+            <span class="types"><span class="type">array</span></span>
+
+        </li>
+    </ul>
+
+    <h3>Returns:</h3>
+    <ol>
+
+        new array without duplicate values
+    </ol>
+
+
+
+    <h3>Usage:</h3>
+    <ul>
+        <pre class="example">distinct({<span class="number">1</span>, <span class="number">1</span>, <span class="number">2</span>, <span class="number">3</span>})  <span class="comment">-- {1, 2, 3}</span></pre>
+    </ul>
+
+</dd>
+    <dt>
+    <a name = "keys"></a>
+    <strong>keys (t)</strong>
+    </dt>
+    <dd>
+    creates a new array with all keys of t
+
+
+    <h3>Parameters:</h3>
+    <ul>
+        <li><span class="parameter">t</span>
+            <span class="types"><a class="type" href="https://www.lua.org/manual/5.3/manual.html#6.6">table</a></span>
+
+        </li>
+    </ul>
+
+    <h3>Returns:</h3>
+    <ol>
+
+        new table
+    </ol>
+
+
+    <h3>See also:</h3>
+    <ul>
+         <a href="index.html#values">values</a>
+    </ul>
+
+    <h3>Usage:</h3>
+    <ul>
+        <li><pre class="example">values({<span class="number">3</span>,<span class="number">4</span>,<span class="number">5</span>})  <span class="comment">-- {1, 2, 3}</span></pre></li>
+        <li><pre class="example">values({a=<span class="number">1</span>, b=<span class="number">2</span>, c=<span class="number">3</span>})  <span class="comment">-- {'a', 'b', 'c'}</span></pre></li>
+    </ul>
+
+</dd>
+    <dt>
+    <a name = "same"></a>
+    <strong>same (t1, t2)</strong>
+    </dt>
+    <dd>
+    compares the values of t1 and t2 for each key of both
+ returns false if any of the values differ and works with nested
+ tables
+
+
+    <h3>Parameters:</h3>
+    <ul>
+        <li><span class="parameter">t1</span>
+            <span class="types"><a class="type" href="https://www.lua.org/manual/5.3/manual.html#6.6">table</a></span>
+
+        </li>
+        <li><span class="parameter">t2</span>
+            <span class="types"><a class="type" href="https://www.lua.org/manual/5.3/manual.html#6.6">table</a></span>
+
+        </li>
+    </ul>
+
+    <h3>Returns:</h3>
+    <ol>
+
+        whether all key/values are the same
+    </ol>
+
+
+    <h3>See also:</h3>
+    <ul>
+         <li><a href="index.html#distinct">distinct</a></li>
+         <li><a href="index.html#append">append</a></li>
+         <li><a href="index.html#keys">keys</a></li>
+    </ul>
+
+    <h3>Usage:</h3>
+    <ul>
+        <li><pre class="example">same({<span class="number">1</span>, <span class="number">2</span>}, {<span class="number">1</span>, <span class="number">2</span>})  <span class="comment">-- true</span></pre></li>
+        <li><pre class="example">same({<span class="number">1</span>, <span class="number">2</span>}, {<span class="number">2</span>, <span class="number">1</span>})  <span class="comment">-- false</span></pre></li>
+        <li><pre class="example">same({a=<span class="number">1</span>, b=<span class="number">2</span>}, {b=<span class="number">2</span>, a=<span class="number">1</span>})  <span class="comment">-- true</span></pre></li>
+    </ul>
+
+</dd>
+    <dt>
+    <a name = "flat"></a>
+    <strong>flat (t, level)</strong>
+    </dt>
+    <dd>
+    flattens up array items of t into single values
+ level controls how many levels of the array should be flattened
+
+
+    <h3>Parameters:</h3>
+    <ul>
+        <li><span class="parameter">t</span>
+            <span class="types"><span class="type">array</span></span>
+
+        </li>
+        <li><span class="parameter">level</span>
+            <span class="types"><span class="type">int</span></span>
+
+        </li>
+    </ul>
+
+    <h3>Returns:</h3>
+    <ol>
+
+        new flattened array
+    </ol>
+
+
+
+    <h3>Usage:</h3>
+    <ul>
+        <li><pre class="example">flat({<span class="number">1</span>, {<span class="number">2</span>}})  <span class="comment">-- {1, 2}</span></pre></li>
+        <li><pre class="example">flat({<span class="number">1</span>, {<span class="number">2</span>, {<span class="number">3</span>}}})  <span class="comment">-- {1, 2, {3}}</span></pre></li>
+        <li><pre class="example">flat({<span class="number">1</span>, {<span class="number">2</span>, {<span class="number">3</span>}}}, <span class="number">2</span>)  <span class="comment">-- {1, 2, 3}</span></pre></li>
+    </ul>
+
+</dd>
+    <dt>
+    <a name = "foreach"></a>
+    <strong>foreach (t, fn)</strong>
+    </dt>
+    <dd>
+    calls fn for each (key, value) of t
+
+
+    <h3>Parameters:</h3>
+    <ul>
+        <li><span class="parameter">t</span>
+            <span class="types"><a class="type" href="https://www.lua.org/manual/5.3/manual.html#6.6">table</a></span>
+
+        </li>
+        <li><span class="parameter">fn</span>
+            <span class="types"><span class="type">function</span></span>
+         (k, v) as params
+        </li>
+    </ul>
+
+
+
+
+    <h3>Usage:</h3>
+    <ul>
+        <pre class="example">foreach({<span class="number">3</span>,<span class="number">4</span>,<span class="number">5</span>}, <span class="keyword">function</span> (k, v) <span class="global">print</span>(k) <span class="keyword">end</span>)</pre>
+    </ul>
+
+</dd>
+    <dt>
+    <a name = "proxy"></a>
+    <strong>proxy (t, newindex, base)</strong>
+    </dt>
+    <dd>
+    creates a table with protected values
+ use it to easely customize table value set and unset
+
+
+    <h3>Parameters:</h3>
+    <ul>
+        <li><span class="parameter">t</span>
+            <span class="types"><a class="type" href="https://www.lua.org/manual/5.3/manual.html#6.6">table</a></span>
+
+        </li>
+        <li><span class="parameter">newindex</span>
+            <span class="types"><span class="type">function</span></span>
+         (t, k, v) as params
+        </li>
+        <li><span class="parameter">base</span>
+            <span class="types"><a class="type" href="https://www.lua.org/manual/5.3/manual.html#6.6">table</a></span>
+        ; use it for custom functions
+        </li>
+    </ul>
+
+    <h3>Returns:</h3>
+    <ol>
+
+        proxied table
+    </ol>
+
+
+
+
+</dd>
+    <dt>
+    <a name = "immutable"></a>
+    <strong>immutable (t)</strong>
+    </dt>
+    <dd>
+    creates a immutable table
+
+
+    <h3>Parameters:</h3>
+    <ul>
+        <li><span class="parameter">t</span>
+            <span class="types"><a class="type" href="https://www.lua.org/manual/5.3/manual.html#6.6">table</a></span>
+
+        </li>
+    </ul>
+
+    <h3>Returns:</h3>
+    <ol>
+
+        new immutable table
+    </ol>
+
+
+
+    <h3>Usage:</h3>
+    <ul>
+        <li><pre class="example">immutable({a=<span class="number">1</span>, b=<span class="number">2</span>, c=<span class="number">3</span>})  <span class="comment">-- constants map</span></pre></li>
+        <li><pre class="example">immutable({<span class="number">1</span>, <span class="number">2</span>, <span class="number">3</span>})  <span class="comment">-- tuple</span></pre></li>
+    </ul>
+
+</dd>
+    <dt>
+    <a name = "join"></a>
+    <strong>join (t1, t2)</strong>
+    </dt>
+    <dd>
+    copies all public (key, value) of t1 and t2 into a new table and returns it
+ if t1 and t2 have key collision, t2 value will have precedence
+
+
+    <h3>Parameters:</h3>
+    <ul>
+        <li><span class="parameter">t1</span>
+            <span class="types"><a class="type" href="https://www.lua.org/manual/5.3/manual.html#6.6">table</a></span>
+
+        </li>
+        <li><span class="parameter">t2</span>
+            <span class="types"><a class="type" href="https://www.lua.org/manual/5.3/manual.html#6.6">table</a></span>
+
+        </li>
+    </ul>
+
+    <h3>Returns:</h3>
+    <ol>
+
+        new table with the values of t1 and t2
+    </ol>
+
+
+    <h3>See also:</h3>
+    <ul>
+         <a href="index.html#merge">merge</a>
+    </ul>
+
+    <h3>Usage:</h3>
+    <ul>
+        <li><pre class="example">join({a=<span class="number">1</span>, c=<span class="number">3</span>}, {a=<span class="number">2</span>, b=<span class="number">2</span>}) <span class="comment">-- {a=2, b=2, c=3}</span></pre></li>
+        <li><pre class="example">join({a=<span class="number">1</span>}, {b=<span class="number">2</span>}) <span class="comment">-- {a=1, b=2}</span></pre></li>
+        <li><pre class="example">join({a=<span class="number">1</span>}, {<span class="number">2</span>}) <span class="comment">-- {a=1, [1]=2}</span></pre></li>
+    </ul>
+
+</dd>
+    <dt>
+    <a name = "merge"></a>
+    <strong>merge (t1, t2)</strong>
+    </dt>
+    <dd>
+    copies all (key, value) of t2 into t1 and returns it
+
+
+    <h3>Parameters:</h3>
+    <ul>
+        <li><span class="parameter">t1</span>
+            <span class="types"><a class="type" href="https://www.lua.org/manual/5.3/manual.html#6.6">table</a></span>
+
+        </li>
+        <li><span class="parameter">t2</span>
+            <span class="types"><a class="type" href="https://www.lua.org/manual/5.3/manual.html#6.6">table</a></span>
+
+        </li>
+    </ul>
+
+    <h3>Returns:</h3>
+    <ol>
+
+        updated t1
+    </ol>
+
+
+    <h3>See also:</h3>
+    <ul>
+         <a href="index.html#join">join</a>
+    </ul>
+
+    <h3>Usage:</h3>
+    <ul>
+        <li><pre class="example">merge({a=<span class="number">1</span>, c=<span class="number">3</span>}, {a=<span class="number">2</span>, b=<span class="number">2</span>}) <span class="comment">-- {a=2, b=2, c=3}</span></pre></li>
+        <li><pre class="example">merge({a=<span class="number">1</span>}, {b=<span class="number">2</span>}) <span class="comment">-- {a=1, b=2}</span></pre></li>
+        <li><pre class="example">merge({a=<span class="number">1</span>}, {<span class="number">2</span>}) <span class="comment">-- {a=1, [1]=2}</span></pre></li>
+    </ul>
+
+</dd>
+    <dt>
+    <a name = "patch"></a>
+    <strong>patch (t1, t2)</strong>
+    </dt>
+    <dd>
+    copies all (key, value) of t2 into t1; throws an error on key collision
+ useful if you want to prevent collision
+
+
+    <h3>Parameters:</h3>
+    <ul>
+        <li><span class="parameter">t1</span>
+            <span class="types"><a class="type" href="https://www.lua.org/manual/5.3/manual.html#6.6">table</a></span>
+
+        </li>
+        <li><span class="parameter">t2</span>
+            <span class="types"><a class="type" href="https://www.lua.org/manual/5.3/manual.html#6.6">table</a></span>
+
+        </li>
+    </ul>
+
+
+
+    <h3>See also:</h3>
+    <ul>
+         <li><a href="index.html#merge">merge</a></li>
+         <li><a href="index.html#join">join</a></li>
+    </ul>
+
+    <h3>Usage:</h3>
+    <ul>
+        <li><pre class="example"><span class="keyword">local</span> a, b = {a=<span class="number">1</span>}, {b=<span class="number">2</span>}; patch(a, b)  <span class="comment">-- {a=1, b=2}</span></pre></li>
+        <li><pre class="example"><span class="keyword">local</span> a, b = {a=<span class="number">1</span>}, {a=<span class="number">2</span>}; patch(a, b)  <span class="comment">-- error</span></pre></li>
+    </ul>
+
+</dd>
+    <dt>
+    <a name = "set"></a>
+    <strong>set ([t={}])</strong>
+    </dt>
+    <dd>
+    creates a new array without repeated values that ignores repeated values
+
+
+    <h3>Parameters:</h3>
+    <ul>
+        <li><span class="parameter">t</span>
+            <span class="types"><span class="type">array</span></span>
+
+         (<em>default</em> {})
+        </li>
+    </ul>
+
+    <h3>Returns:</h3>
+    <ol>
+
+        new set table
+    </ol>
+
+
+
+    <h3>Usage:</h3>
+    <ul>
+        <pre class="example">set({<span class="number">1</span>, <span class="number">1</span>, <span class="number">2</span>, <span class="number">2</span>, <span class="number">3</span>})  <span class="comment">-- {1, 2, 3}</span></pre>
+    </ul>
+
+</dd>
+    <dt>
+    <a name = "slice"></a>
+    <strong>slice (t, _i, _e)</strong>
+    </dt>
+    <dd>
+    gets you an slice of the array
+ negative indexes are not supported
+
+
+    <h3>Parameters:</h3>
+    <ul>
+        <li><span class="parameter">t</span>
+            <span class="types"><span class="type">array</span></span>
+
+        </li>
+        <li><span class="parameter">_i</span>
+            <span class="types"><span class="type">int</span></span>
+         initial position of the slice
+        </li>
+        <li><span class="parameter">_e</span>
+            <span class="types"><span class="type">int</span></span>
+         final position of the slice
+        </li>
+    </ul>
+
+    <h3>Returns:</h3>
+    <ol>
+
+        table with only the elements of the slice
+    </ol>
+
+
+
+
+</dd>
+    <dt>
+    <a name = "sorted"></a>
+    <strong>sorted (t, fn)</strong>
+    </dt>
+    <dd>
+    creates a sorted copy of t
+
+
+    <h3>Parameters:</h3>
+    <ul>
+        <li><span class="parameter">t</span>
+            <span class="types"><a class="type" href="https://www.lua.org/manual/5.3/manual.html#6.6">table</a></span>
+
+        </li>
+        <li><span class="parameter">fn</span>
+            <span class="types"><span class="type">function</span></span>
+         (a, b) as params; same as fn in table.sort(t, fn)
+        </li>
+    </ul>
+
+    <h3>Returns:</h3>
+    <ol>
+
+        new sorted table
+    </ol>
+
+
+
+    <h3>Usage:</h3>
+    <ul>
+        <pre class="example">sorted({<span class="number">4</span>, <span class="number">3</span>})  <span class="comment">-- {3, 4}</span></pre>
+    </ul>
+
+</dd>
+    <dt>
+    <a name = "union"></a>
+    <strong>union (t1, t2)</strong>
+    </dt>
+    <dd>
+    creates a new array with all values of t1 and t2
+ keys are not preserved; order of the values is not
+ guaranteed.
+
+
+    <h3>Parameters:</h3>
+    <ul>
+        <li><span class="parameter">t1</span>
+            <span class="types"><a class="type" href="https://www.lua.org/manual/5.3/manual.html#6.6">table</a></span>
+
+        </li>
+        <li><span class="parameter">t2</span>
+            <span class="types"><a class="type" href="https://www.lua.org/manual/5.3/manual.html#6.6">table</a></span>
+
+        </li>
+    </ul>
+
+    <h3>Returns:</h3>
+    <ol>
+
+        new table
+    </ol>
+
+
+    <h3>See also:</h3>
+    <ul>
+         <a href="index.html#append">append</a>
+    </ul>
+
+    <h3>Usage:</h3>
+    <ul>
+        <pre class="example">union({<span class="number">3</span>, <span class="number">4</span>}, {<span class="number">1</span>, <span class="number">2</span>})  <span class="comment">-- {3, 4, 1, 2}</span></pre>
+    </ul>
+
+</dd>
+    <dt>
+    <a name = "values"></a>
+    <strong>values (t)</strong>
+    </dt>
+    <dd>
+    creates a new array with all values of t
+
+
+    <h3>Parameters:</h3>
+    <ul>
+        <li><span class="parameter">t</span>
+            <span class="types"><a class="type" href="https://www.lua.org/manual/5.3/manual.html#6.6">table</a></span>
+
+        </li>
+    </ul>
+
+    <h3>Returns:</h3>
+    <ol>
+
+        new table
+    </ol>
+
+
+    <h3>See also:</h3>
+    <ul>
+         <a href="index.html#keys">keys</a>
+    </ul>
+
+    <h3>Usage:</h3>
+    <ul>
+        <li><pre class="example">values({<span class="number">3</span>,<span class="number">4</span>,<span class="number">5</span>})  <span class="comment">-- {3, 4, 5}</span></pre></li>
+        <li><pre class="example">values({a=<span class="number">1</span>, b=<span class="number">2</span>, c=<span class="number">3</span>})  <span class="comment">-- {1, 2, 3}</span></pre></li>
+    </ul>
+
+</dd>
+</dl>
 
 
 </div> <!-- id="content" -->
 </div> <!-- id="main" -->
 <div id="about">
 <i>generated by <a href="http://github.com/stevedonovan/LDoc">LDoc 1.4.6</a></i>
-<i style="float:right;">Last updated 2019-03-11 22:51:50 </i>
+<i style="float:right;">Last updated 2019-03-11 23:19:55 </i>
 </div> <!-- id="about" -->
 </div> <!-- id="container" -->
 </body>

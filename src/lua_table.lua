@@ -6,13 +6,13 @@
 
 -- @section functions
 
---- inserts all values of `t2` in `t1`
--- keys of `t2` are not preserved; `t2` are inserted
--- in order only if `t2` is an array.
+--- inserts all values of t2 in t1
+-- keys of t2 are not preserved; t2 are inserted
+-- in order only if t2 is an array.
 --
 -- @tparam array t1
 -- @tparam array t2
--- @return `t1`
+-- @return t1
 -- @usage a, b = {1}, {2}; union(a, b) -- {1, 2}
 -- @see union
 local function append (t1, t2)
@@ -23,7 +23,7 @@ local function append (t1, t2)
   return t1
 end
 
---- creates a deep copy of `t` ignoring
+--- creates a deep copy of t; ignores metatable
 -- keys are copied as they are; if value is a table, copy is recursively
 -- called for it; make sure table is not a cyclic tree before using copy.
 --
@@ -50,7 +50,7 @@ local function distinct (t)
   local tmp = {}
   local v_tmp = {}
 
-  for k, v in pairs(t) do
+  for _, v in pairs(t) do
       if not v_tmp[v] then
           table.insert(tmp, v)
           v_tmp[v] = true
@@ -60,7 +60,7 @@ local function distinct (t)
   return tmp
 end
 
---- returns a new table with all keys in `t`
+--- creates a new array with all keys of t
 --
 -- @tparam table t
 -- @return new table
@@ -77,7 +77,7 @@ local function keys (t)
   return tmp
 end
 
---- compares the values of `t1` and `t2` for each key of both
+--- compares the values of t1 and t2 for each key of both
 -- returns false if any of the values differ and works with nested
 -- tables
 --
@@ -114,7 +114,7 @@ local function same (t1, t2)
   return true
 end
 
---- flattens up array items of `t` into single values
+--- flattens up array items of t into single values
 -- level controls how many levels of the array should be flattened
 --
 -- @tparam array t
@@ -136,7 +136,7 @@ local function flat (t, level)
   return tmp
 end
 
---- calls `fn` for each (key, value) of `t`
+--- calls fn for each (key, value) of t
 --
 -- @tparam table t
 -- @tparam function fn (k, v) as params
@@ -176,12 +176,12 @@ local function immutable (t)
   end)
 end
 
---- copies all public (key, value) of `t1` and `t2` into a new table and returns it
--- if `t1` and `t2` have key collision, `t2` value will have precedence
+--- copies all public (key, value) of t1 and t2 into a new table and returns it
+-- if t1 and t2 have key collision, t2 value will have precedence
 --
 -- @tparam table t1
 -- @tparam table t2
--- @return new table with the values of `t1` and `t2`
+-- @return new table with the values of t1 and t2
 -- @usage join({a=1, c=3}, {a=2, b=2}) -- {a=2, b=2, c=3}
 -- @usage join({a=1}, {b=2}) -- {a=1, b=2}
 -- @usage join({a=1}, {2}) -- {a=1, [1]=2}
@@ -200,11 +200,11 @@ local function join (t1, t2)
   return tmp
 end
 
---- copies all (key, value) of `t2` into `t1` and returns it
+--- copies all (key, value) of t2 into t1 and returns it
 --
 -- @tparam table t1
 -- @tparam table t2
--- @return updated `t1`
+-- @return updated t1
 -- @usage merge({a=1, c=3}, {a=2, b=2}) -- {a=2, b=2, c=3}
 -- @usage merge({a=1}, {b=2}) -- {a=1, b=2}
 -- @usage merge({a=1}, {2}) -- {a=1, [1]=2}
@@ -217,7 +217,7 @@ local function merge (t1, t2)
   return t1
 end
 
---- copies all (key, value) of `t2` into `t1`; throws an error on key collision
+--- copies all (key, value) of t2 into t1; throws an error on key collision
 -- useful if you want to prevent collision
 --
 -- @tparam table t1
@@ -243,7 +243,7 @@ local function set (t)
   local rev = {}  -- reverse index
   local tmp = distinct(t) or {}
 
-  for k, v in pairs(tmp) do rev[v] = true end
+  for _, v in pairs(tmp) do rev[v] = true end
 
   -- force newindex call with "emptish" table
   return proxy(tmp, function (_, k, v)
@@ -260,6 +260,7 @@ local function set (t)
 end
 
 --- gets you an slice of the array
+-- negative indexes are not supported
 --
 -- @tparam array t
 -- @tparam int _i initial position of the slice
@@ -268,7 +269,7 @@ end
 local function slice (t, _i, _e)
   local tmp = {}
   _i = math.max(_i, 1)
-  _e = _e or #t
+  _e = math.min(_e or #t, #t)
 
   for i=_i, _e do
     table.insert(tmp, t[i])
@@ -277,11 +278,11 @@ local function slice (t, _i, _e)
   return tmp
 end
 
---- creates a sorted copy of `t`
+--- creates a sorted copy of t
 --
 -- @tparam table t
--- @tparam function fn (a, b) as params
--- @return new table
+-- @tparam function fn (a, b) as params; same as fn in table.sort(t, fn)
+-- @return new sorted table
 -- @usage sorted({4, 3})  -- {3, 4}
 local function sorted (t, fn)
   local tmp = copy(t)
@@ -291,7 +292,7 @@ local function sorted (t, fn)
   return tmp
 end
 
---- creates a new array with all values of `t1` and `t2`
+--- creates a new array with all values of t1 and t2
 -- keys are not preserved; order of the values is not
 -- guaranteed.
 --
@@ -314,7 +315,7 @@ local function union (t1, t2)
   return tmp
 end
 
---- returns a new table with all values in `t`
+--- creates a new array with all values of t
 --
 -- @tparam table t
 -- @return new table
