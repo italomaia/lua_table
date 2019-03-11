@@ -68,31 +68,31 @@ describe('distinct output is as expected', function ()
   end)
 end)
 
-describe('equal output is as expected', function ()
-  local equal = require('lua_table').equal
+describe('same output is as expected', function ()
+  local same = require('lua_table').same
 
-  it('empty arrays are equal', function ()
-    assert.is_true(equal({}, {}))
+  it('empty arrays are same', function ()
+    assert.is_true(same({}, {}))
   end)
 
-  it('compares flat equal arrays as equal', function ()
-    assert.is_true(equal({1, 2, 3}, {1, 2, 3}))
+  it('compares flat same arrays as same', function ()
+    assert.is_true(same({1, 2, 3}, {1, 2, 3}))
   end)
 
-  it('compares non-flat equal arrays as equal', function ()
-    assert.is_true(equal({1, {2, 3}}, {1, {2, 3}}))
+  it('compares non-flat same arrays as same', function ()
+    assert.is_true(same({1, {2, 3}}, {1, {2, 3}}))
   end)
 
-  it('compares different length arrays as not equal', function ()
-    assert.is_false(equal({1, 2, 3}, {1, 2, 3, 4}))
+  it('compares different length arrays as not same', function ()
+    assert.is_false(same({1, 2, 3}, {1, 2, 3, 4}))
   end)
 
-  it('compares different flat arrays as not equal', function ()
-    assert.is_false(equal({a=1, b=2}, {a=1, b=2, c=3}))
+  it('compares different flat arrays as not same', function ()
+    assert.is_false(same({a=1, b=2}, {a=1, b=2, c=3}))
   end)
 
-  it('compares different non-flat arrays as not equal', function ()
-    assert.is_false(equal({1, 2}, {1, {2}}))
+  it('compares different non-flat arrays as not same', function ()
+    assert.is_false(same({1, 2}, {1, {2}}))
   end)
 end)
 
@@ -271,9 +271,41 @@ describe('merge output is as expected', function ()
   end)
 end)
 
+describe('patch creates expected behavior', function ()
+  local patch = require('lua_table').patch
+
+  it('returns nothing', function ()
+    local a, b = {a=1}, {b=2}
+    assert.is_nil(patch(a, b))
+  end)
+
+  it('merges two tables', function ()
+    local a, b = {a=1}, {b=2}
+
+    patch(a, b)
+    assert.are.same(a, {a=1, b=2})
+  end)
+
+  it('throws error on collision', function ()
+    local a, b = {a=1}, {a=2}
+
+    assert.has_errors(function ()
+      patch(a, b)
+    end)
+  end)
+
+  it('always throws error with arrays', function ()
+    local a, b = {1}, {2}
+
+    assert.has_errors(function ()
+      patch(a, b)
+    end)
+  end)
+end)
+
 describe('proxy creates expected behavior', function ()
   local proxy = require('lua_table').proxy
-  local equal = require('lua_table').equal
+  local same = require('lua_table').same
 
   it('newindex is always called', function ()
     local count = 0
@@ -284,7 +316,7 @@ describe('proxy creates expected behavior', function ()
     end)
 
     table.insert(p, 10)
-    assert.is_true(equal(t, p))
+    assert.is_true(same(t, p))
     assert.are.equal(#t, 4)
     assert.are.equal(#p, 4)
     assert.are.equal(count, 1)
@@ -295,7 +327,7 @@ describe('proxy creates expected behavior', function ()
     local p = proxy(t, function (t, k, v) end)
 
     table.insert(p, 10)
-    assert.is_true(equal(t, p))
+    assert.is_true(same(t, p))
     assert.are.equal(#t, 3)
     assert.are.equal(#p, 3)
   end)
@@ -303,10 +335,10 @@ end)
 
 describe('set output is as expected', function ()
   local set = require('lua_table').set
-  local equal = require('lua_table').equal
+  local same = require('lua_table').same
 
   it('behaves as regular tables', function ()
-    assert.are.is_true(equal(set({3, 4, 5}), {3, 4, 5}))
+    assert.are.is_true(same(set({3, 4, 5}), {3, 4, 5}))
   end)
 
   it('removes repeated values', function ()
@@ -315,7 +347,7 @@ describe('set output is as expected', function ()
 
     assert.are_not.equal(#t, #s)
     assert.are.equal(#s, 3)
-    assert.are.is_true(equal(s, {3, 4, 5}))
+    assert.are.is_true(same(s, {3, 4, 5}))
   end)
 
   it("doesn't add repetead values", function ()

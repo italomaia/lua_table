@@ -15,12 +15,12 @@ local function append (t1, t2)
   return t1
 end
 
---- creates a deep copy of `t` ignoring protected attributes
+--- creates a deep copy of `t` ignoring
 -- keys are copied as they are; if value is a table, copy is recursively
 -- called for it; make sure table is not a cyclic tree before using copy.
 --
 -- @table non cyclic tree
--- @return new table with all non-protected attributes of `t`
+-- @return new table with all attributes of `t`
 local function copy (t)
   local tmp = {}
 
@@ -75,12 +75,12 @@ end
 --
 -- @table
 -- @table
--- @return whether all values are equal
+-- @return whether all key/values are the same
 -- @depends distinct, append, keys
--- @usage equal({1, 2}, {1, 2})  -- true
--- @usage equal({1, 2}, {2, 1})  -- false
--- @usage equal({a=1, b=2}, {b=2, a=1})  -- true
-local function equal (t1, t2)
+-- @usage same({1, 2}, {1, 2})  -- true
+-- @usage same({1, 2}, {2, 1})  -- false
+-- @usage same({a=1, b=2}, {b=2, a=1})  -- true
+local function same (t1, t2)
   -- shortcircuit
   if #t1 ~= #t2 then return false end
 
@@ -92,7 +92,7 @@ local function equal (t1, t2)
 
     -- compare tables?
     if type(t1[key]) == 'table' then
-      if not equal(t1[key], t2[key]) then
+      if not same(t1[key], t2[key]) then
         return false
       end
     -- compare scalars!
@@ -189,7 +189,7 @@ local function join (t1, t2)
   return tmp
 end
 
---- copies all public (key, value) of `t2` into `t1` and returns it
+--- copies all (key, value) of `t2` into `t1` and returns it
 --
 -- @table
 -- @table
@@ -204,6 +204,22 @@ local function merge (t1, t2)
   end
 
   return t1
+end
+
+--- copies all (key, value) of `t2` into `t1`; throws an error on key collision
+-- useful if you want to prevent collision
+--
+-- @table
+-- @table
+-- @usage local a, b = {a=1}, {b=2}; patch(a, b)  -- {a=1, b=2}
+-- @usage local a, b = {a=1}, {a=2}; patch(a, b)  -- error
+-- @see `merge`, `join`
+local function patch (t1, t2)
+  for k, v in pairs(t2) do
+    if t1[k] then error('key collision on patch') end
+
+    t1[k] = v
+  end
 end
 
 --- creates a new array without repeated values that ignores repeated values
@@ -306,13 +322,14 @@ return {
   ['append']=append,
   ['copy']=copy,
   ['distinct']=distinct,
-  ['equal']=equal,
+  ['same']=same,
   ['flat']=flat,
   ['foreach']=foreach,
   ['immutable']=immutable,
   ['join']=join,
   ['keys']=keys,
   ['merge']=merge,
+  ['patch']=patch,
   ['proxy']=proxy,
   ['set']=set,
   ['slice']=slice,
