@@ -1,5 +1,3 @@
 return {
-    _all = {
-        coverage = true
-    }
+    _all = { }
 }
