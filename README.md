@@ -1,7 +1,7 @@
 *lua_table* is a friendly library to help you get more productive with Lua. It packs
 common operations over tables that might save you some coding in the long run.
 
-Usage with **lua5.1, lua5.2 and luajit** of now has some issues. Please, only use this module with **lua5.3 or later**. A fix is on the way.  
+**compatibility:** lua5.3
 
 ## Why?
 

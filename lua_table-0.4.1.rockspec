@@ -1,8 +1,8 @@
 package="lua_table"
-version="0.4"
+version="0.4.1"
 source = {
     url = "https://github.com/italomaia/lua_table",
-    tag = "0.4"
+    tag = "0.4.1"
 }
 description = {
     summary = "set of useful table functions to speed up development with lua",
@@ -17,7 +17,7 @@ description = {
     license = "MIT/X11"
 }
 dependencies = {
-   "lua >= 5.1"
+   "lua >= 5.3"
 }
 build = {
     type = "builtin",
