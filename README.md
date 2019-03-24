@@ -15,7 +15,7 @@ luarocks install lua_table
 
 ## Getting Started
 
-[docs](https://github.com/italomaia/lua_table/blob/master/docs/index.html)
+[Documentation](https://italomaia.github.io/lua_table/)
 
 *lua_table* usage is advised in one of the following ways:
 
