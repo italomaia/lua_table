@@ -1,3 +1,6 @@
 return {
-    _all = { }
+    _all = { },
+    default = {
+        ['defer-print'] = 'yes'
+    }
 }

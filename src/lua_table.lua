@@ -217,23 +217,6 @@ local function merge (t1, t2)
   return t1
 end
 
---- copies all (key, value) of t2 into t1; throws an error on key collision
--- useful if you want to prevent collision
---
--- @tparam table t1
--- @tparam table t2
--- @usage local a, b = {a=1}, {b=2}; patch(a, b)  -- {a=1, b=2}
--- @usage local a, b = {a=1}, {a=2}; patch(a, b)  -- error
--- @see merge
--- @see join
-local function patch (t1, t2)
-  for k, v in pairs(t2) do
-    if t1[k] then error('key collision on patch') end
-
-    t1[k] = v
-  end
-end
-
 --- creates a new array without repeated values that ignores repeated values
 --
 -- @tparam[opt={}] array t
@@ -257,6 +240,38 @@ local function set (t)
       return rev[v] == true
     end
   })
+end
+
+--- copies all (key, value) of t2 into t1; throws an error on key collision
+-- useful if you want to prevent collision
+--
+-- @tparam table t1
+-- @tparam table t2
+-- @tparam[opt] table rename - copy values of t2 to t1 to a different index;
+--    {copy_t2_key=as_t1_key}
+-- @tparam[opt] array only - only copy this subset of t2 values to t1
+-- @tparam[opt] array exclude - do not copy this subset of t2 values to t1
+-- @usage local a, b = {a=1}, {a=2}; patch(a, b)  -- error
+-- @usage local a, b = {a=1}, {b=2, c=3}; patch(a, b)  -- {a=1, b=2, c=3}
+-- @usage local a, b = {a=1}, {b=2}; patch(a, b, {b='c'})  -- {a=1, c=2}
+-- @usage local a, b = {a=1}, {b=2, c=3}; patch(a, b, nil, {'c'})  -- {a=1, c=3}
+-- @usage local a, b = {a=1}, {b=2, c=3}; patch(a, b, nil, nil, {'c'})  -- {a=1, b=2}
+-- @see merge
+-- @see join
+local function patch (t1, t2, rename, only, exclude)
+  only = only or keys(t2)
+  exclude = set(exclude or {})
+  rename = rename or {}
+
+  for _, key in pairs(only) do
+    if not exclude:has(key) then
+      local name = rename[key] or key
+
+      if t1[name] then error('key collision on patch') end
+
+      t1[name] = t2[key]
+    end
+  end
 end
 
 --- gets you an slice of the array
