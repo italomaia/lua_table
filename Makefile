@@ -12,4 +12,5 @@ test-53: build-image-53 run-test-53
 
 test: build-images run-tests
 
-docs: ldoc .
+docs:
+	ldoc $(pwd)
