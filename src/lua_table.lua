@@ -13,7 +13,7 @@
 -- @tparam array t1
 -- @tparam array t2
 -- @return t1
--- @usage a, b = {1}, {2}; union(a, b) -- {1, 2}
+-- @usage a, b = {1}, {2}; append(a, b) -- {1, 2}
 -- @see union
 local function append (t1, t2)
   for _, v in pairs(t2) do
@@ -176,7 +176,7 @@ local function immutable (t)
   end)
 end
 
---- copies all public (key, value) of t1 and t2 into a new table and returns it
+--- copies all (key, value) of t1 and t2 into a new table and returns it
 -- if t1 and t2 have key collision, t2 value will have precedence
 --
 -- @tparam table t1
@@ -200,7 +200,7 @@ local function join (t1, t2)
   return tmp
 end
 
---- copies all (key, value) of t2 into t1 and returns it
+--- copies all (key, value) of t2 into t1 and returns t1
 --
 -- @tparam table t1
 -- @tparam table t2
