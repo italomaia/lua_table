@@ -101,21 +101,21 @@
 	</tr>
 	<tr>
 	<td class="name" nowrap><a href="#join">join (t1, t2)</a></td>
-	<td class="summary">copies all public (key, value) of t1 and t2 into a new table and returns it
+	<td class="summary">copies all (key, value) of t1 and t2 into a new table and returns it
  if t1 and t2 have key collision, t2 value will have precedence</td>
 	</tr>
 	<tr>
 	<td class="name" nowrap><a href="#merge">merge (t1, t2)</a></td>
-	<td class="summary">copies all (key, value) of t2 into t1 and returns it</td>
-	</tr>
-	<tr>
-	<td class="name" nowrap><a href="#patch">patch (t1, t2)</a></td>
-	<td class="summary">copies all (key, value) of t2 into t1; throws an error on key collision
- useful if you want to prevent collision</td>
+	<td class="summary">copies all (key, value) of t2 into t1 and returns t1</td>
 	</tr>
 	<tr>
 	<td class="name" nowrap><a href="#set">set ([t={}])</a></td>
 	<td class="summary">creates a new array without repeated values that ignores repeated values</td>
+	</tr>
+	<tr>
+	<td class="name" nowrap><a href="#patch">patch (t1, t2[, rename[, only[, exclude]]])</a></td>
+	<td class="summary">copies all (key, value) of t2 into t1; throws an error on key collision
+ useful if you want to prevent collision</td>
 	</tr>
 	<tr>
 	<td class="name" nowrap><a href="#slice">slice (t, _i, _e)</a></td>
@@ -181,7 +181,7 @@
 
     <h3>Usage:</h3>
     <ul>
-        <pre class="example">a, b = {<span class="number">1</span>}, {<span class="number">2</span>}; union(a, b) <span class="comment">-- {1, 2}</span></pre>
+        <pre class="example">a, b = {<span class="number">1</span>}, {<span class="number">2</span>}; append(a, b) <span class="comment">-- {1, 2}</span></pre>
     </ul>
 
 </dd>
@@ -459,7 +459,7 @@
     <strong>join (t1, t2)</strong>
     </dt>
     <dd>
-    copies all public (key, value) of t1 and t2 into a new table and returns it
+    copies all (key, value) of t1 and t2 into a new table and returns it
  if t1 and t2 have key collision, t2 value will have precedence
 
 
@@ -500,7 +500,7 @@
     <strong>merge (t1, t2)</strong>
     </dt>
     <dd>
-    copies all (key, value) of t2 into t1 and returns it
+    copies all (key, value) of t2 into t1 and returns t1
 
 
     <h3>Parameters:</h3>
@@ -536,42 +536,6 @@
 
 </dd>
     <dt>
-    <a name = "patch"></a>
-    <strong>patch (t1, t2)</strong>
-    </dt>
-    <dd>
-    copies all (key, value) of t2 into t1; throws an error on key collision
- useful if you want to prevent collision
-
-
-    <h3>Parameters:</h3>
-    <ul>
-        <li><span class="parameter">t1</span>
-            <span class="types"><a class="type" href="https://www.lua.org/manual/5.3/manual.html#6.6">table</a></span>
-
-        </li>
-        <li><span class="parameter">t2</span>
-            <span class="types"><a class="type" href="https://www.lua.org/manual/5.3/manual.html#6.6">table</a></span>
-
-        </li>
-    </ul>
-
-
-
-    <h3>See also:</h3>
-    <ul>
-         <li><a href="index.html#merge">merge</a></li>
-         <li><a href="index.html#join">join</a></li>
-    </ul>
-
-    <h3>Usage:</h3>
-    <ul>
-        <li><pre class="example"><span class="keyword">local</span> a, b = {a=<span class="number">1</span>}, {b=<span class="number">2</span>}; patch(a, b)  <span class="comment">-- {a=1, b=2}</span></pre></li>
-        <li><pre class="example"><span class="keyword">local</span> a, b = {a=<span class="number">1</span>}, {a=<span class="number">2</span>}; patch(a, b)  <span class="comment">-- error</span></pre></li>
-    </ul>
-
-</dd>
-    <dt>
     <a name = "set"></a>
     <strong>set ([t={}])</strong>
     </dt>
@@ -599,6 +563,61 @@
     <h3>Usage:</h3>
     <ul>
         <pre class="example">set({<span class="number">1</span>, <span class="number">1</span>, <span class="number">2</span>, <span class="number">2</span>, <span class="number">3</span>})  <span class="comment">-- {1, 2, 3}</span></pre>
+    </ul>
+
+</dd>
+    <dt>
+    <a name = "patch"></a>
+    <strong>patch (t1, t2[, rename[, only[, exclude]]])</strong>
+    </dt>
+    <dd>
+    copies all (key, value) of t2 into t1; throws an error on key collision
+ useful if you want to prevent collision
+
+
+    <h3>Parameters:</h3>
+    <ul>
+        <li><span class="parameter">t1</span>
+            <span class="types"><a class="type" href="https://www.lua.org/manual/5.3/manual.html#6.6">table</a></span>
+
+        </li>
+        <li><span class="parameter">t2</span>
+            <span class="types"><a class="type" href="https://www.lua.org/manual/5.3/manual.html#6.6">table</a></span>
+
+        </li>
+        <li><span class="parameter">rename</span>
+            <span class="types"><a class="type" href="https://www.lua.org/manual/5.3/manual.html#6.6">table</a></span>
+         - copy values of t2 to t1 to a different index;
+    {copy_t2_key=as_t1_key}
+         (<em>optional</em>)
+        </li>
+        <li><span class="parameter">only</span>
+            <span class="types"><span class="type">array</span></span>
+         - only copy this subset of t2 values to t1
+         (<em>optional</em>)
+        </li>
+        <li><span class="parameter">exclude</span>
+            <span class="types"><span class="type">array</span></span>
+         - do not copy this subset of t2 values to t1
+         (<em>optional</em>)
+        </li>
+    </ul>
+
+
+
+    <h3>See also:</h3>
+    <ul>
+         <li><a href="index.html#merge">merge</a></li>
+         <li><a href="index.html#join">join</a></li>
+    </ul>
+
+    <h3>Usage:</h3>
+    <ul>
+        <li><pre class="example"><span class="keyword">local</span> a, b = {a=<span class="number">1</span>}, {a=<span class="number">2</span>}; patch(a, b)  <span class="comment">-- error</span></pre></li>
+        <li><pre class="example"><span class="keyword">local</span> a, b = {a=<span class="number">1</span>}, {b=<span class="number">2</span>, c=<span class="number">3</span>}; patch(a, b)  <span class="comment">-- {a=1, b=2, c=3}</span></pre></li>
+        <li><pre class="example"><span class="keyword">local</span> a, b = {a=<span class="number">1</span>}, {b=<span class="number">2</span>}; patch(a, b, {b=<span class="string">'c'</span>})  <span class="comment">-- {a=1, c=2}</span></pre></li>
+        <li><pre class="example"><span class="keyword">local</span> a, b = {a=<span class="number">1</span>}, {b=<span class="number">2</span>, c=<span class="number">3</span>}; patch(a, b, <span class="keyword">nil</span>, {<span class="string">'c'</span>})  <span class="comment">-- {a=1, c=3}</span></pre></li>
+        <li><pre class="example"><span class="keyword">local</span> a, b = {a=<span class="number">1</span>}, {b=<span class="number">2</span>, c=<span class="number">3</span>}; patch(a, b, <span class="keyword">nil</span>, <span class="keyword">nil</span>, {<span class="string">'c'</span>})  <span class="comment">-- {a=1, b=2}</span></pre></li>
     </ul>
 
 </dd>
@@ -753,7 +772,7 @@
 </div> <!-- id="main" -->
 <div id="about">
 <i>generated by <a href="http://github.com/stevedonovan/LDoc">LDoc 1.4.6</a></i>
-<i style="float:right;">Last updated 2019-03-11 23:19:55 </i>
+<i style="float:right;">Last updated 2019-04-03 07:58:58 </i>
 </div> <!-- id="about" -->
 </div> <!-- id="container" -->
 </body>

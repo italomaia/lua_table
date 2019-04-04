@@ -301,6 +301,34 @@ describe('patch creates expected behavior', function ()
       patch(a, b)
     end)
   end)
+
+  it('patch with renamed attrs', function ()
+    local a, b = {a=1}, {b=2}
+
+    patch(a, b, {b='c'})
+    assert.are.same(a, {a=1, c=2})
+  end)
+
+  it('patch with attr subset', function ()
+    local a, b = {a=1}, {b=2, c=3}
+
+    patch(a, b, nil, {'c'})
+    assert.are.same(a, {a=1, c=3})
+  end)
+
+  it('patch with excluded subset', function ()
+    local a, b = {a=1}, {b=2, c=3, d=4}
+
+    patch(a, b, nil, nil, {'d'})
+    assert.are.same(a, {a=1, b=2, c=3})
+  end)
+
+  it('excluded has priority over only', function ()
+    local a, b = {a=1}, {b=2, c=3, d=4}
+
+    patch(a, b, nil, {'b', 'c'}, {'c'})
+    assert.are.same(a, {a=1, b=2})
+  end)
 end)
 
 describe('proxy creates expected behavior', function ()
