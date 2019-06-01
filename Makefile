@@ -1,16 +1,35 @@
-build-image-53:
-	docker build -t lua-table-test-53 --build-arg LUA_V=5.3 .
+test-51:
+	docker run --rm \
+		-v "$PWD:/root"\
+		alpine sh -c "\
+			apk add luarocks5.1 &&\
+			cd /root &&\
+			USER=root luarocks-5.1 install busted &&\
+			busted .\
+		"
 
-run-test-53:
-	docker run --rm -v "$(PWD):/root" lua-table-test-53
+test-52:
+	docker run --rm \
+		-v "$PWD:/root"\
+		alpine sh -c "\
+			apk add luarocks5.2 &&\
+			cd /root &&\
+			USER=root luarocks-5.2 install busted &&\
+			busted .\
+		"
 
-build-images: build-image-53
+test-53:
+	docker run --rm \
+		-v "$PWD:/root"\
+		alpine sh -c "\
+			apk add luarocks5.3 &&\
+			cd /root &&\
+			USER=root luarocks-5.3 install busted &&\
+			busted .\
+		"
 
-run-tests: run-test-53
+test:
+	busted .
 
-test-53: build-image-53 run-test-53
-
-test: build-images run-tests
-
-docs:
-	ldoc $(pwd)
+build-docs:
+	ldoc .
