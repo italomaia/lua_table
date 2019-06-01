@@ -1,8 +1,8 @@
 package="lua_table"
-version="0.4.2"
+version="0.4.3-0"
 source = {
-    url = "https://github.com/italomaia/lua_table",
-    tag = "0.4.2"
+    url = "git+https://github.com/italomaia/lua_table",
+    tag = "0.4.3-0"
 }
 description = {
     summary = "set of useful table functions to speed up development with lua",
