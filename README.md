@@ -112,4 +112,7 @@ assert(same(sorted({3, 2, 1}), {1, 2, 3}))
 -- copy creates a new instance
 assert(copy({2, 3, 4}) ~= {2, 3, 4})
 assert(same(copy({2, 3, 4}), {2, 3, 4}))
+
+-- collect creates a new array from iterator return values
+assert(same(collect(string.gmatch('test', '%w')), {'t', 'e', 's', 't'}))
 ```

@@ -23,6 +23,28 @@ local function append (t1, t2)
   return t1
 end
 
+--- creates a new array from return values of an iterator
+--
+-- @tparam function iter iterator function
+-- @tparam[opt] table state the invariant state
+-- @tparam[opt] var index the current index
+-- @return new table with all values returned by the iterator
+-- @usage collect(string.gmatch('test', '%w')) -- { "t", "e", "s", "t" }
+-- @usage collect(io.lines('/tmp/test.txt'))
+local function collect (iter, state, index)
+  local tmp = {}
+
+  while true do
+    index = iter(state, index)
+
+    if not index then break end
+
+    table.insert(tmp, index)
+  end
+
+  return tmp
+end
+
 --- creates a deep copy of t; ignores metatable
 -- keys are copied as they are; if value is a table, copy is recursively
 -- called for it; make sure table is not a cyclic tree before using copy.
@@ -349,6 +371,7 @@ end
 
 return {
   ['append']=append,
+  ['collect']=collect,
   ['copy']=copy,
   ['distinct']=distinct,
   ['same']=same,

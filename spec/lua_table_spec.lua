@@ -21,6 +21,44 @@ describe('append output is as expected', function ()
   end)
 end)
 
+describe('collect output is as expected', function ()
+  local collect = require('lua_table').collect
+  local test_file = 'test.txt'
+
+  setup(function ()
+    local fd = io.open(test_file, 'w')
+
+    for _, v in pairs({ 'Lua', 'is', 'awesome' }) do
+      fd:write(v .. '\n')
+    end
+
+    fd:close()
+  end)
+
+  teardown(function ()
+    os.remove(test_file)
+  end)
+
+  it('creates new array from io.lines return values', function ()
+    local t = { 'Lua', 'is', 'awesome' }
+
+    assert.are.same(collect(io.lines(test_file)), t)
+  end)
+
+  it('creates new array from string.gmatch matches', function ()
+    local t = { 't', 'e', 's', 't' }
+    local str = 'test'
+
+    assert.are.same(collect(str:gmatch('%w')), t)
+  end)
+
+  it('creates new array from ipairs', function ()
+    local t = { 1, 2, 3 }
+
+    assert.are.same(collect(ipairs(t)), t)
+  end)
+end)
+
 describe('copy output is as expected', function ()
   local copy = require('lua_table').copy
 
