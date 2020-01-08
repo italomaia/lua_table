@@ -8,6 +8,6 @@ RUN apk add --update \
 && apk add --no-cache --virtual .build-deps gcc libc-dev \
 && USER=root luarocks-${LUA_V} install busted \
 && apk del --purge .build-deps \
-&& rm -rf /var/cache/apk/* /tmp/*
+&& rm -rf /tmp/*
 WORKDIR /root
 CMD ["busted"]
