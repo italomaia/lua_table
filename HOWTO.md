@@ -1,7 +1,13 @@
 ```
 # run tests
-busted --lua=/usr/bin/lua
+busted
+
+# or
+make test
 
 # generate docs
 ldoc .
+
+# or
+make build-docs
 ```

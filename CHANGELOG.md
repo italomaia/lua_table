@@ -1,3 +1,8 @@
+**0.4.3-1**
+
+* updated docs
+* fixed docker tests
+
 **0.4.3-0**
 
 * fixed package naming

@@ -34,14 +34,31 @@ require('lua_table').patch(_G, ltable)
 
 ```
 local ltable = require('lua_table')
+local append = ltable.append
+local copy = ltable.copy
+local distinct = ltable.distinct
+local keys = ltable.keys
+local same = ltable.same
+local flat = ltable.flat
+local foreach = ltable.foreach
+local proxy = ltable.proxy
+local immutable = ltable.immutable
+local join = ltable.join
+local merge = ltable.merge
+local set = ltable.set
+local patch = ltable.patch
+local slice = ltable.slice
+local sorted = ltable.sorted
+local union = ltable.union
+local values = ltable.values
 
--- patch table with ltable, so all functions of ltable become available
--- from table
-ltable.patch(table, ltable)
+-- you can patch the table module with ltable, so all functions of ltable
+-- become available from table
+-- ltable.patch(table, ltable)
 
 -- you can also patch _G and make all functions available globally
 -- DON'T DO THIS FOR ANYTHING BUT SIMPLE SCRIPTS
-ltable.patch(_G, ltable)
+-- ltable.patch(_G, ltable)
 
 local a1, a2, a3 = {1, 2}, {3, 4}, {5, 6, 7}
 local t1, t2, t3 = {a=1}, {b=2, c=3}, {d=4, e=5, f=6}
@@ -113,3 +130,8 @@ assert(same(sorted({3, 2, 1}), {1, 2, 3}))
 assert(copy({2, 3, 4}) ~= {2, 3, 4})
 assert(same(copy({2, 3, 4}), {2, 3, 4}))
 ```
+
+## Functional Programming
+
+If you need to add functional programming behavior to your program,
+be sure to check the [lua_fun project](https://github.com/italomaia/lua_fun).

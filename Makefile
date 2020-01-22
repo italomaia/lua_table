@@ -1,32 +1,14 @@
 test-51:
-	docker run --rm \
-		-v "$PWD:/root"\
-		alpine sh -c "\
-			apk add luarocks5.1 &&\
-			cd /root &&\
-			USER=root luarocks-5.1 install busted &&\
-			busted .\
-		"
+	docker build --build-arg LUA_V=5.1 -t lua_table/test:51 .
+	docker run --rm -v "$(PWD):/root" lua_table/test:51
 
 test-52:
-	docker run --rm \
-		-v "$PWD:/root"\
-		alpine sh -c "\
-			apk add luarocks5.2 &&\
-			cd /root &&\
-			USER=root luarocks-5.2 install busted &&\
-			busted .\
-		"
+	docker build --build-arg LUA_V=5.2 -t lua_table/test:52 .
+	docker run --rm -v "$(PWD):/root" lua_table/test:52
 
 test-53:
-	docker run --rm \
-		-v "$PWD:/root"\
-		alpine sh -c "\
-			apk add luarocks5.3 &&\
-			cd /root &&\
-			USER=root luarocks-5.3 install busted &&\
-			busted .\
-		"
+	docker build --build-arg LUA_V=5.3 -t lua_table/test:53 .
+	docker run --rm -v "$(PWD):/root" lua_table/test:53
 
 test:
 	busted .
